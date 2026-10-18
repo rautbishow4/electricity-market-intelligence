@@ -1,4 +1,3 @@
-
 # European Electricity Market Intelligence
 
 ## Overview
@@ -10,11 +9,13 @@ The goal is to build a repeatable pipeline that collects electricity market pric
 ## Current progress
 
 - Retrieved day-ahead electricity prices at 15-minute resolution
-- Retrieved electricity load and renewable generation at hourly resolution
+- Retrieved electricity load and renewable generation data at hourly resolution
 - Built a Python ingestion script using the SMARD API
 - Saved raw datasets locally as CSV files
-- Implemented data-quality checks for missing values, duplicates, and time intervals
-- Investigated missing values returned by the source API
+- Implemented a data preparation script to clean raw data and create a separate staging layer
+- Implemented data-quality checks for missing values, duplicate timestamps, invalid timestamps, and time intervals
+- Investigated missing values returned by the source API and refreshed the affected datasets
+- Validated the staging datasets, with all five datasets passing the current basic validation checks
 
 ## Technology stack
 
@@ -25,11 +26,9 @@ The goal is to build a repeatable pipeline that collects electricity market pric
 
 ## Data source
 
-SMARD — Germany's electricity market data platform:
-https://www.smard.de/
+SMARD — Germany's electricity market data platform: [https://www.smard.de/](https://www.smard.de/)
 
-Community API documentation:
-https://github.com/bundesAPI/smard-api
+Community API documentation: [https://github.com/bundesAPI/smard-api](https://github.com/bundesAPI/smard-api)
 
 ## Run locally
 
@@ -45,18 +44,30 @@ Run the ingestion pipeline:
 python ingest_smard.py
 ```
 
-Run data validation:
+Prepare the staging datasets:
 
 ```bash
-python validate_smard_data.py
+python prepare_smard_data.py
 ```
 
-The pipeline writes downloaded CSV files to `data/raw/`. These generated files are excluded from Git.
+Validate the staging datasets:
+
+```bash
+python validate_smard_data.py staging
+```
+
+To validate the raw datasets instead:
+
+```bash
+python validate_smard_data.py raw
+```
+
+The pipeline writes downloaded CSV files to `data/raw/` and prepared datasets to `data/staging/`. These generated files are excluded from Git.
 
 ## Planned improvements
 
 - Improve incremental ingestion and historical backfills
-- Add data-quality and API error handling
+- Improve data-quality handling and API error handling
 - Transform data into a consistent analytical model
 - Load data into PostgreSQL
 - Build SQL-based KPIs and a data warehouse
